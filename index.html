@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" translate="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
+<meta http-equiv="Content-Language" content="en">
+<meta name="google" content="notranslate">
+<meta name="robots" content="notranslate">
 <title>Mohamed Hesham & Abrar Hassan — Friday, 18.09.2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,6 +32,7 @@
   html, body {
     background-color: var(--ivory) !important;
     color: var(--ink) !important;
+    direction: ltr !important;
   }
 
   *{box-sizing:border-box;}
@@ -374,7 +378,7 @@
   }
 </style>
 </head>
-<body>
+<body class="notranslate" translate="no">
 
 <div id="envelope-screen">
   <div class="env-wrap">
@@ -516,25 +520,6 @@
     <div class="wishes-wall" id="wishesWall"></div>
   </section>
 
-  <section id="inspector-panel">
-    <div class="eyebrow" style="color: var(--gold-soft);">Host Inspector Dashboard</div>
-    <h2 style="font-size:32px; margin-top:10px; color: var(--ivory);">Live Cloud Database Sync</h2>
-    <p style="font-size:15px; color:var(--ivory-2); opacity: 0.8;">Host Account: m97hesham@gmail.com</p>
-    
-    <div class="charts-container">
-      <div class="chart-card">
-        <h3 style="font-size: 18px; margin-bottom: 15px;">Attendance Summary</h3>
-        <canvas id="rsvpChart"></canvas>
-      </div>
-      <div class="chart-card">
-        <h3 style="font-size: 18px; margin-bottom: 15px;">Song Requests Distribution</h3>
-        <canvas id="songChart"></canvas>
-      </div>
-    </div>
-    
-    <button class="export-btn" id="exportDataBtn">📥 Download & Collect All Guest Data</button>
-  </section>
-
   <footer>Mohamed Hesham &amp; Abrar Hassan · Friday, 18 September 2026 · Lanovia Wedding Venue</footer>
 </main>
 
@@ -611,7 +596,10 @@ let rsvpChart, songChart;
 function initCharts() {
   const rsvpCtx = document.getElementById('rsvpChart');
   const songCtx = document.getElementById('songChart');
-  if(!rsvpCtx || !songCtx) return;
+  if(!rsvpCtx || !songCtx) {
+    fetchCloudData();
+    return;
+  }
 
   rsvpChart = new Chart(rsvpCtx.getContext('2d'), {
     type: 'doughnut',
@@ -661,17 +649,20 @@ async function fetchCloudData() {
 }
 
 function updateUI() {
-  if(!rsvpChart || !songChart) return;
-  const attendingCount = rsvpData.filter(r => r.attending && r.attending.toLowerCase() === 'yes').length;
-  const declinedCount = rsvpData.filter(r => r.attending && r.attending.toLowerCase() === 'no').length;
-  rsvpChart.data.datasets[0].data = [attendingCount, declinedCount];
-  rsvpChart.update();
+  if(rsvpChart) {
+    const attendingCount = rsvpData.filter(r => r.attending && r.attending.toLowerCase() === 'yes').length;
+    const declinedCount = rsvpData.filter(r => r.attending && r.attending.toLowerCase() === 'no').length;
+    rsvpChart.data.datasets[0].data = [attendingCount, declinedCount];
+    rsvpChart.update();
+  }
 
-  const introCount = songData.filter(s => s.cat && s.cat.toLowerCase() === 'intro').length;
-  const midCount = songData.filter(s => s.cat && (s.cat.toLowerCase() === 'mid-wedding' || s.cat.toLowerCase() === 'midwedding')).length;
-  const outroCount = songData.filter(s => s.cat && s.cat.toLowerCase() === 'outro').length;
-  songChart.data.datasets[0].data = [introCount, midCount, outroCount];
-  songChart.update();
+  if(songChart) {
+    const introCount = songData.filter(s => s.cat && s.cat.toLowerCase() === 'intro').length;
+    const midCount = songData.filter(s => s.cat && (s.cat.toLowerCase() === 'mid-wedding' || s.cat.toLowerCase() === 'midwedding')).length;
+    const outroCount = songData.filter(s => s.cat && s.cat.toLowerCase() === 'outro').length;
+    songChart.data.datasets[0].data = [introCount, midCount, outroCount];
+    songChart.update();
+  }
 
   renderSongs();
   renderWishes();
