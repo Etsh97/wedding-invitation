@@ -63,6 +63,12 @@
     font-family:'Amiri', serif;
     direction:rtl;
   }
+  /* Force Western (English) numerals everywhere, regardless of device/browser locale */
+  .numerals-en, .cd-num, .cd-label, .dt-value, .dt-label, .names-en, .eyebrow,
+  input, select, textarea, .wish-text, .song-entry, .song-entry .by, footer {
+    font-variant-numeric: lining-nums;
+    unicode-bidi: plaintext;
+  }
   button, input, select, textarea {font-family:'Inter', sans-serif;}
 
   #envelope-screen{
@@ -406,27 +412,27 @@
       </svg>
     </div>
     <div class="eyebrow">Together with their families</div>
-    <h1 class="names-ar arabic">محمد هشام<span class="amp">و</span>أبرار حسن</h1>
+    <h1 class="names-ar arabic" lang="ar" dir="rtl">محمد هشام<span class="amp">و</span>أبرار حسن</h1>
     <div class="names-en">Mohamed Hesham &nbsp;·&nbsp; Abrar Hassan</div>
     <p class="welcome-text">
       With hearts full of joy, we warmly welcome you to witness the beginning of our story.
       Your presence is the finest gift we could ask for.
     </p>
 
-    <div id="countdown-row">
+    <div id="countdown-row" lang="en" dir="ltr">
       <div class="cd-box"><div class="cd-num" id="cd-days">00</div><div class="cd-label">Days</div></div>
       <div class="cd-box"><div class="cd-num" id="cd-hours">00</div><div class="cd-label">Hours</div></div>
       <div class="cd-box"><div class="cd-num" id="cd-mins">00</div><div class="cd-label">Minutes</div></div>
       <div class="cd-box"><div class="cd-num" id="cd-secs">00</div><div class="cd-label">Seconds</div></div>
     </div>
     <div class="divider"></div>
-    <div class="eyebrow">Friday, 18 · 09 · 2026 — 6:00 PM — Lanovia Wedding Venue</div>
+    <div class="eyebrow" lang="en" dir="ltr">Friday, 18 · 09 · 2026 — 6:00 PM — Lanovia Wedding Venue</div>
   </section>
 
   <section id="details">
     <div class="eyebrow">The Celebration</div>
     <h2 style="font-size:32px; margin-top:10px; color:var(--ivory);">Join us as we begin our journey</h2>
-    <div class="detail-grid">
+    <div class="detail-grid" lang="en" dir="ltr">
       <div class="detail-item">
         <div class="dt-label">Date</div>
         <div class="dt-value">Friday, 18 Sept 2026</div>
@@ -460,7 +466,7 @@
       </div>
       <div>
         <label for="rsvpGuests">Number of Guests Attending</label>
-        <select id="rsvpGuests">
+        <select id="rsvpGuests" lang="en" dir="ltr">
           <option value="1">1 Person</option>
           <option value="2">2 People</option>
           <option value="3">3 People</option>
@@ -569,6 +575,16 @@ musicToggle.addEventListener('click', () => {
 });
 
 const weddingDate = new Date('2026-09-18T18:00:00').getTime();
+
+// Force Western Arabic (English) numerals for the countdown digits,
+// even on devices/browsers whose locale would otherwise localize them.
+function toEnglishDigits(n){
+  return String(n).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+}
+function pad2(n){
+  return toEnglishDigits(n).padStart(2, '0');
+}
+
 function updateCountdown(){
   const now = new Date().getTime();
   const diff = weddingDate - now;
@@ -579,10 +595,10 @@ function updateCountdown(){
   const secs = Math.floor((diff % (1000 * 60)) / 1000);
   const dDays = document.getElementById('cd-days');
   if(dDays) {
-    dDays.textContent = String(days).padStart(2, '0');
-    document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
-    document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
-    document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
+    dDays.textContent = pad2(days);
+    document.getElementById('cd-hours').textContent = pad2(hours);
+    document.getElementById('cd-mins').textContent = pad2(mins);
+    document.getElementById('cd-secs').textContent = pad2(secs);
   }
 }
 setInterval(updateCountdown, 1000);
